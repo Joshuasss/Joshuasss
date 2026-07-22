@@ -1,7 +1,7 @@
 """Contract tests for BaseAgent.
 
 Uses throwaway stub agents to verify the base class's guarantees. These stubs
-are test fixtures only — not real analytical agents.
+are test fixtures only — not real analytical agents, and carry no strategy.
 """
 
 from datetime import datetime, timezone
@@ -9,15 +9,16 @@ from datetime import datetime, timezone
 import pytest
 
 from core.base_agent import BaseAgent
+from core.enums import AgentGroup, AgentName, Signal
 from core.errors import AgentError
-from core.schemas import AgentInput, AgentOutput, Horizon, Signal
+from core.schemas import AgentInput, AgentOutput, TimeHorizon
 
 
 def _input() -> AgentInput:
     return AgentInput(
         ticker="AAPL",
         as_of=datetime(2026, 1, 1, tzinfo=timezone.utc),
-        horizon=Horizon.SHORT_TERM,
+        horizon=TimeHorizon.SHORT_TERM,
         request_id="req-42",
     )
 
@@ -29,7 +30,8 @@ class _EchoAgent(BaseAgent):
 
     def analyze(self, agent_input: AgentInput) -> AgentOutput:
         return AgentOutput(
-            agent_name=self.name,
+            agent_name=AgentName.MOMENTUM_AGENT,
+            group=AgentGroup.SHORT_TERM,
             ticker=agent_input.ticker,
             as_of=agent_input.as_of,
             signal=Signal.HOLD,
